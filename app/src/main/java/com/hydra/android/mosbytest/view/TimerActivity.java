@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.hydra.android.mosbytest.R;
-import com.hydra.android.mosbytest.model.StopWatch;
+import com.hydra.android.mosbytest.model.Timer;
 import com.hydra.android.mosbytest.presenter.TimerPresenter;
 
 public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresenter>
@@ -83,7 +83,7 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
     }
 
     @Override
-    public void showStopped(StopWatch timer, boolean wasDestroyed) {
+    public void showStopped(Timer timer, boolean wasDestroyed) {
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerStopped();
@@ -92,7 +92,7 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
     }
 
     @Override
-    public void showRunning(StopWatch timer, boolean wasDestroyed) {
+    public void showRunning(Timer timer, boolean wasDestroyed) {
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerRunning();
@@ -107,18 +107,11 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
     }
 
     @Override
-    public void showPaused(StopWatch timer, boolean wasDestroyed) {
+    public void showPaused(Timer timer, boolean wasDestroyed) {
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerPaused();
 
         presenter.pause();
-    }
-
-    @Override
-    public void setTimerData(StopWatch timer) {
-        if (vs == null)
-            vs = (TimerViewState) viewState;
-        vs.setTimerData(timer);
     }
 }

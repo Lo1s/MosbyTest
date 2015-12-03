@@ -8,6 +8,4 @@ package com.hydra.android.mosbytest.model;
 public interface TimerHandlerListener {
 
     void onTimerUpdate(String time);
-
-    void passTimerObject(StopWatch timer);
 }

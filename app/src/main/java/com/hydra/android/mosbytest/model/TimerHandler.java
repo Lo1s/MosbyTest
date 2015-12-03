@@ -14,20 +14,21 @@ public class TimerHandler extends Handler {
 
     private final int REFRESH_RATE = 100;
 
-    private StopWatch timer;
+    private Timer timer;
     private TimerHandlerListener listener;
 
-    public TimerHandler(Looper looper, TimerHandlerListener listener, StopWatch timer) {
+    public TimerHandler(Looper looper, TimerHandlerListener listener, Timer timer,
+                        boolean isStopWatch) {
         super(looper);
         this.listener = listener;
 
         if (timer == null)
-            this.timer = new StopWatch();
+            this.timer = new Timer(isStopWatch);
         else
             this.timer = timer;
     }
 
-    public StopWatch getTimer() {
+    public Timer getTimer() {
         return timer;
     }
 
@@ -37,7 +38,6 @@ public class TimerHandler extends Handler {
         switch (msg.what) {
             case MSG_START_TIMER:
                 timer.start();
-                listener.passTimerObject(this.timer);
                 sendEmptyMessage(MSG_UPDATE_TIMER);
                 break;
             case MSG_PAUSE_TIMER:

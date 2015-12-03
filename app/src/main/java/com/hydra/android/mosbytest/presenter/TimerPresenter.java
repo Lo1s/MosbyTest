@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
-import com.hydra.android.mosbytest.model.StopWatch;
+import com.hydra.android.mosbytest.model.Timer;
 import com.hydra.android.mosbytest.model.TimerHandler;
 import com.hydra.android.mosbytest.model.TimerHandlerListener;
 import com.hydra.android.mosbytest.view.TimerView;
@@ -36,18 +36,18 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
         Log.i(TAG, "start()");
         cancelHandlerIfRunning();
 
-        mHandler = new TimerHandler(Looper.getMainLooper(), this, null);
+        mHandler = new TimerHandler(Looper.getMainLooper(), this, null, true);
 
         if (isViewAttached()) {
             mHandler.sendEmptyMessage(TimerHandler.MSG_START_TIMER);
         }
     }
 
-    public void resume(StopWatch timer) {
+    public void resume(Timer timer) {
         Log.i(TAG, "resume()");
         cancelHandlerIfRunning();
 
-        mHandler = new TimerHandler(Looper.getMainLooper(), this, timer);
+        mHandler = new TimerHandler(Looper.getMainLooper(), this, timer, timer.getTypeOfTimer());
 
         if (isViewAttached()) {
             mHandler.sendEmptyMessage(TimerHandler.MSG_RESUME_TIMER);
@@ -71,7 +71,7 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
     }
 
     public void saveTimerObjectToFile(Context context) {
-        StopWatch timer;
+        Timer timer;
         if (mHandler != null) {
             timer = mHandler.getTimer();
             if (timer != null) {
@@ -113,7 +113,7 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
             context.deleteFile("savedtimer.json");
             Log.i(TAG, "Loaded file: " + builder.toString());
 
-            StopWatch timer = fromJsonToTimer(builder.toString());
+            Timer timer = fromJsonToTimer(builder.toString());
             if (timer.isRunning()) {
                 getView().showRunning(timer , true);
             } else if (!timer.isRunning()) {
@@ -126,9 +126,9 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
         }
     }
 
-    private StopWatch fromJsonToTimer(String json) {
+    private Timer fromJsonToTimer(String json) {
         Gson gson = new Gson();
-        return gson.fromJson(json, StopWatch.class);
+        return gson.fromJson(json, Timer.class);
     }
 
     @Override
@@ -137,8 +137,4 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
             getView().showTime(time);
     }
 
-    @Override
-    public void passTimerObject(StopWatch timer) {
-        getView().setTimerData(timer);
-    }
 }
