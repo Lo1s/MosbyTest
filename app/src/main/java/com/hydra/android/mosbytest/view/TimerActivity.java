@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.hannesdorfmann.mosby.mvp.viewstate.MvpViewStateActivity;
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
 import com.hydra.android.mosbytest.R;
-import com.hydra.android.mosbytest.model.Timer;
 import com.hydra.android.mosbytest.presenter.TimerPresenter;
 
 public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresenter>
@@ -18,8 +17,8 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
 
 
     private TextView timerTextView;
-    private Button startButton;
-    private Button stopButton;
+    private Button startStopButton;
+    private Button resetButton;
     private TimerViewState vs;
 
     private void initLayout() {
@@ -28,21 +27,31 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
             public void onClick(View v) {
                 int id = v.getId();
                 switch (id) {
-                    case R.id.startButton:
-                        showRunning(null, false);
+                    case R.id.startStopButton:
+                        if (presenter.isTimerRunning()) {
+                            if (presenter.isTimerPaused()) {
+                                showResumed(false);
+                                startStopButton.setText("Stop");
+                            } else {
+                                showPaused(false);
+                                startStopButton.setText("Start");
+                            }
+                        } else {
+                            showStarted(false);
+                            startStopButton.setText("Stop");
+                        }
                         break;
-
-                    case R.id.stopButton:
-                        showStopped(null, false);
+                    case R.id.resetButton:
+                        resetTime();
                         break;
                 }
             }
         };
 
-        startButton = (Button) findViewById(R.id.startButton);
-        startButton.setOnClickListener(buttonListener);
-        stopButton = (Button) findViewById(R.id.stopButton);
-        stopButton.setOnClickListener(buttonListener);
+        startStopButton = (Button) findViewById(R.id.startStopButton);
+        startStopButton.setOnClickListener(buttonListener);
+        resetButton = (Button) findViewById(R.id.resetButton);
+        resetButton.setOnClickListener(buttonListener);
         timerTextView = (TextView) findViewById(R.id.timerTextView);
     }
 
@@ -74,7 +83,8 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        presenter.saveTimerObjectToFile(this);
+        if (!isRestoringViewState())
+            presenter.saveTimerObjectToFile(this);
     }
 
     @Override
@@ -82,36 +92,46 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
         timerTextView.setText(time);
     }
 
-    @Override
-    public void showStopped(Timer timer, boolean wasDestroyed) {
-        if (vs == null)
-            vs = (TimerViewState) viewState;
-        vs.setTimerStopped();
-
-        presenter.stop();
-    }
 
     @Override
-    public void showRunning(Timer timer, boolean wasDestroyed) {
+    public void showStarted(boolean wasDestroyed) {
+        Log.i("Destroyed", wasDestroyed + "");
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerRunning();
 
         if (isRestoringViewState() || wasDestroyed) {
             //animation here
-            if (timer != null)
-                presenter.resume(timer);
+            showResumed(wasDestroyed);
         } else {
             presenter.start();
         }
     }
 
     @Override
-    public void showPaused(Timer timer, boolean wasDestroyed) {
+    public void showResumed(boolean wasDestroyed) {
+        if (vs == null)
+            vs = (TimerViewState) viewState;
+        vs.setTimerRunning();
+
+        presenter.resume();
+    }
+
+    @Override
+    public void showPaused(boolean wasDestroyed) {
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerPaused();
 
         presenter.pause();
+    }
+
+    @Override
+    public void resetTime() {
+        if (vs == null)
+            vs = (TimerViewState) viewState;
+        vs.setTimerStopped();
+
+        presenter.reset();
     }
 }

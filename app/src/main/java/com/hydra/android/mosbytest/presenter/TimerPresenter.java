@@ -24,6 +24,7 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
 
     private final String TAG = "TimerPresenter";
     private TimerHandler mHandler;
+    private Timer timer;
 
     private void cancelHandlerIfRunning() {
         if (mHandler != null) {
@@ -36,29 +37,24 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
         Log.i(TAG, "start()");
         cancelHandlerIfRunning();
 
-        mHandler = new TimerHandler(Looper.getMainLooper(), this, null, true);
+        mHandler = new TimerHandler(Looper.getMainLooper(), this);
 
         if (isViewAttached()) {
             mHandler.sendEmptyMessage(TimerHandler.MSG_START_TIMER);
         }
     }
 
-    public void resume(Timer timer) {
+    public void resume() {
         Log.i(TAG, "resume()");
-        cancelHandlerIfRunning();
 
-        mHandler = new TimerHandler(Looper.getMainLooper(), this, timer, timer.getTypeOfTimer());
+        if (mHandler == null) {
+            mHandler = new TimerHandler(Looper.getMainLooper(), this);
+            if (this.timer != null)
+                mHandler.setTimer(this.timer);
+        }
 
         if (isViewAttached()) {
             mHandler.sendEmptyMessage(TimerHandler.MSG_RESUME_TIMER);
-        }
-    }
-
-    public void stop() {
-        Log.i(TAG, "stop()");
-
-        if (isViewAttached() && mHandler != null) {
-            mHandler.sendEmptyMessage(TimerHandler.MSG_STOP_TIMER);
         }
     }
 
@@ -68,6 +64,22 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
         if (isViewAttached() && mHandler != null) {
             mHandler.sendEmptyMessage(TimerHandler.MSG_PAUSE_TIMER);
         }
+    }
+
+    public void reset() {
+        Log.i(TAG, "reset()");
+
+        if (isViewAttached() && mHandler != null) {
+            mHandler.sendEmptyMessage(TimerHandler.MSG_RESET_TIMER);
+        }
+    }
+
+    public boolean isTimerRunning() {
+        return (mHandler == null ? false : mHandler.getTimer().isRunning());
+    }
+
+    public boolean isTimerPaused() {
+        return (mHandler == null ? false : mHandler.getTimer().isPaused());
     }
 
     public void saveTimerObjectToFile(Context context) {
@@ -113,11 +125,12 @@ public class TimerPresenter extends MvpBasePresenter<TimerView> implements Timer
             context.deleteFile("savedtimer.json");
             Log.i(TAG, "Loaded file: " + builder.toString());
 
-            Timer timer = fromJsonToTimer(builder.toString());
-            if (timer.isRunning()) {
-                getView().showRunning(timer , true);
-            } else if (!timer.isRunning()) {
-                getView().showStopped(timer, true);
+            this.timer = fromJsonToTimer(builder.toString());
+
+            if (this.timer.isRunning()) {
+                getView().showStarted(true);
+            } else if (!this.timer.isRunning()) {
+                getView().showPaused(true);
             }
 
         } catch (IOException ex) {

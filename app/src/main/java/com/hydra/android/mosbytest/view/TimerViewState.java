@@ -1,9 +1,6 @@
 package com.hydra.android.mosbytest.view;
 
-import android.os.Parcelable;
-
 import com.hannesdorfmann.mosby.mvp.viewstate.ViewState;
-import com.hydra.android.mosbytest.model.Timer;
 
 /**
  * Created by jslapnicka on 1.12.2015.
@@ -14,10 +11,7 @@ public class TimerViewState implements ViewState<TimerView> {
     final int STATE_TIMER_IS_RUNNING = 1;
     final int STATE_TIMER_IS_PAUSED = 2;
 
-    private final String KEY_TIMER = "TimerViewState-data";
-
     int state = STATE_TIMER_IS_STOPPED;
-    public Parcelable timerData;
 
     public void setTimerStopped() {
         state = STATE_TIMER_IS_STOPPED;
@@ -40,13 +34,13 @@ public class TimerViewState implements ViewState<TimerView> {
 
         switch (state) {
             case STATE_TIMER_IS_STOPPED:
-                view.showStopped((Timer) timerData, false);
+                view.resetTime();
                 break;
             case STATE_TIMER_IS_RUNNING:
-                view.showRunning((Timer) timerData, false);
+                view.showStarted(false);
                 break;
             case STATE_TIMER_IS_PAUSED:
-                view.showPaused((Timer) timerData, false);
+                view.showPaused(false);
                 break;
         }
     }

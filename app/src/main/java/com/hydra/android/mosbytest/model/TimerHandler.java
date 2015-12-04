@@ -9,7 +9,7 @@ public class TimerHandler extends Handler {
     public static final int MSG_START_TIMER = 0;
     public static final int MSG_PAUSE_TIMER = 1;
     public static final int MSG_RESUME_TIMER = 2;
-    public static final int MSG_STOP_TIMER = 3;
+    public static final int MSG_RESET_TIMER = 3;
     public static final int MSG_UPDATE_TIMER = 4;
 
     private final int REFRESH_RATE = 100;
@@ -17,19 +17,20 @@ public class TimerHandler extends Handler {
     private Timer timer;
     private TimerHandlerListener listener;
 
-    public TimerHandler(Looper looper, TimerHandlerListener listener, Timer timer,
-                        boolean isStopWatch) {
+    public TimerHandler(Looper looper, TimerHandlerListener listener) {
         super(looper);
         this.listener = listener;
 
         if (timer == null)
-            this.timer = new Timer(isStopWatch);
-        else
-            this.timer = timer;
+            this.timer = new Timer();
     }
 
     public Timer getTimer() {
         return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
     }
 
     @Override
@@ -43,15 +44,16 @@ public class TimerHandler extends Handler {
             case MSG_PAUSE_TIMER:
                 timer.pause();
                 listener.onTimerUpdate(timer.getElapsedTimeMili() + "");
+                removeMessages(MSG_UPDATE_TIMER);
                 break;
             case MSG_RESUME_TIMER:
                 timer.resume();
                 sendEmptyMessage(MSG_UPDATE_TIMER);
                 break;
-            case MSG_STOP_TIMER:
-                removeMessages(MSG_UPDATE_TIMER);
-                timer.stop();
+            case MSG_RESET_TIMER:
+                timer.reset();
                 listener.onTimerUpdate(timer.getElapsedTimeMili() + "");
+                removeMessages(MSG_UPDATE_TIMER);
                 break;
             case MSG_UPDATE_TIMER:
                 listener.onTimerUpdate(timer.getElapsedTimeMili() + "");

@@ -14,38 +14,44 @@ Modified: Bilal Rabbani bilalrabbani1@live.com (Nov 2013)
 
 public class Timer {
     private long startTime = 0;
+    private long elapsedTime = 0;
     private long currentTime = 0;
     private boolean running = false;
+    private boolean paused = false;
     private boolean isStopWatch = true;
     private static final int NUMBER_OF_ARGS = 3;
-
-    public Timer(boolean isStopWatch) {
-        this.isStopWatch = isStopWatch;
-    }
 
     public void start() {
         if (isStopWatch) {
             this.startTime = System.currentTimeMillis();
             this.running = true;
-        }
-    }
+            this.paused = false;
+        } else {
 
-    public void stop() {
-        if (isStopWatch) {
-            this.running = false;
-        }
-    }
-
-    public void pause() {
-        if (isStopWatch) {
-            this.running = false;
-            currentTime = System.currentTimeMillis() - startTime;
         }
     }
 
     public void resume() {
         if (isStopWatch) {
             this.running = true;
+            this.paused = false;
+            this.startTime = System.currentTimeMillis() - elapsedTime;
+        }
+    }
+
+    public void pause() {
+        if (isStopWatch) {
+            this.running = true;
+            this.paused = true;
+            this.elapsedTime = System.currentTimeMillis() - startTime;
+        }
+    }
+
+    public void reset() {
+        if (isStopWatch) {
+            this.running = false;
+            this.paused = false;
+            this.startTime = 0;
         }
     }
 
@@ -61,6 +67,8 @@ public class Timer {
         this.currentTime = currentTime;
     }
 
+    public void setTypeOfTimer(boolean isStopWatch) { this.isStopWatch = isStopWatch; }
+
     public long getStartTime() {
         return this.startTime;
     }
@@ -68,6 +76,8 @@ public class Timer {
     public boolean isRunning() {
         return this.running;
     }
+
+    public boolean isPaused() {return this.paused; }
 
     public long getCurrentTime() {
         return this.currentTime;
