@@ -13,46 +13,59 @@ Modified: Bilal Rabbani bilalrabbani1@live.com (Nov 2013)
 
 
 public class Timer {
+    private long hour;
+    private long minute;
+    private long second;
     private long startTime = 0;
     private long elapsedTime = 0;
     private long currentTime = 0;
     private boolean running = false;
-    private boolean paused = false;
-    private boolean isStopWatch = true;
-    private static final int NUMBER_OF_ARGS = 3;
+    private boolean stopped = false;
+    private boolean isStopWatch = true; // if false - countdown timer is running instead
 
     public void start() {
         if (isStopWatch) {
             this.startTime = System.currentTimeMillis();
             this.running = true;
-            this.paused = false;
+            this.stopped = false;
         } else {
-
+            if (!isStopped()) {
+                this.startTime = System.currentTimeMillis()
+            }
         }
     }
 
     public void resume() {
         if (isStopWatch) {
+            if (isStopped()) {
+                this.startTime = System.currentTimeMillis() - elapsedTime;
+                this.stopped = false;
+            }
             this.running = true;
-            this.paused = false;
-            this.startTime = System.currentTimeMillis() - elapsedTime;
         }
     }
 
-    public void pause() {
+    public void stop() {
         if (isStopWatch) {
+            if (!isStopped() && isRunning())
+                this.elapsedTime = System.currentTimeMillis() - startTime;
+            this.stopped = true;
             this.running = true;
-            this.paused = true;
-            this.elapsedTime = System.currentTimeMillis() - startTime;
         }
     }
 
     public void reset() {
         if (isStopWatch) {
             this.running = false;
-            this.paused = false;
+            this.stopped = false;
+            this.isStopWatch = true;
             this.startTime = 0;
+            this.elapsedTime = 0;
         }
+    }
+
+    public void setCountDownTime(long hour, long minute, long second) {
+
     }
 
     public void setStartTime(long startTime) {
@@ -67,7 +80,9 @@ public class Timer {
         this.currentTime = currentTime;
     }
 
-    public void setTypeOfTimer(boolean isStopWatch) { this.isStopWatch = isStopWatch; }
+    public void setTypeOfTimer(boolean isStopWatch) {
+        this.isStopWatch = isStopWatch;
+    }
 
     public long getStartTime() {
         return this.startTime;
@@ -77,7 +92,9 @@ public class Timer {
         return this.running;
     }
 
-    public boolean isPaused() {return this.paused; }
+    public boolean isStopped() {
+        return this.stopped;
+    }
 
     public long getCurrentTime() {
         return this.currentTime;
@@ -87,11 +104,15 @@ public class Timer {
         return isStopWatch;
     }
 
+    public long getElapsedTime() {
+        return (elapsedTime / 100) % 1000;
+    }
+
     //elaspsed time in milliseconds
     public long getElapsedTimeMili() {
         long elapsed = 0;
         if (running) {
-            elapsed =((System.currentTimeMillis() - startTime)/100) % 1000 ;
+            elapsed = ((System.currentTimeMillis() - startTime) / 100) % 1000;
         }
         return elapsed;
     }
@@ -109,7 +130,7 @@ public class Timer {
     public long getElapsedTimeMin() {
         long elapsed = 0;
         if (running) {
-            elapsed = (((System.currentTimeMillis() - startTime) / 1000) / 60 ) % 60;
+            elapsed = (((System.currentTimeMillis() - startTime) / 1000) / 60) % 60;
         }
         return elapsed;
     }
@@ -118,7 +139,7 @@ public class Timer {
     public long getElapsedTimeHour() {
         long elapsed = 0;
         if (running) {
-            elapsed = ((((System.currentTimeMillis() - startTime) / 1000) / 60 ) / 60);
+            elapsed = ((((System.currentTimeMillis() - startTime) / 1000) / 60) / 60);
         }
         return elapsed;
     }

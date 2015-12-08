@@ -9,7 +9,7 @@ public class TimerViewState implements ViewState<TimerView> {
 
     final int STATE_TIMER_IS_STOPPED = 0;
     final int STATE_TIMER_IS_RUNNING = 1;
-    final int STATE_TIMER_IS_PAUSED = 2;
+    final int STATE_TIMER_IS_RESETED = 2;
 
     int state = STATE_TIMER_IS_STOPPED;
 
@@ -21,9 +21,10 @@ public class TimerViewState implements ViewState<TimerView> {
         state = STATE_TIMER_IS_RUNNING;
     }
 
-    public void setTimerPaused() {
-        state = STATE_TIMER_IS_PAUSED;
+    public void setTimerReseted() {
+        state = STATE_TIMER_IS_RESETED;
     }
+
 
     /**
      * Is called from Mosby to apply the view state to the view.
@@ -34,13 +35,13 @@ public class TimerViewState implements ViewState<TimerView> {
 
         switch (state) {
             case STATE_TIMER_IS_STOPPED:
-                view.resetTime();
+                view.showStopped(false);
                 break;
             case STATE_TIMER_IS_RUNNING:
-                view.showStarted(false);
+                view.showResumed(false);
                 break;
-            case STATE_TIMER_IS_PAUSED:
-                view.showPaused(false);
+            case STATE_TIMER_IS_RESETED:
+                view.resetTime();
                 break;
         }
     }

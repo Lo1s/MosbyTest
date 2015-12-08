@@ -3,11 +3,12 @@ package com.hydra.android.mosbytest.model;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 public class TimerHandler extends Handler {
 
     public static final int MSG_START_TIMER = 0;
-    public static final int MSG_PAUSE_TIMER = 1;
+    public static final int MSG_STOP_TIMER = 1;
     public static final int MSG_RESUME_TIMER = 2;
     public static final int MSG_RESET_TIMER = 3;
     public static final int MSG_UPDATE_TIMER = 4;
@@ -41,14 +42,16 @@ public class TimerHandler extends Handler {
                 timer.start();
                 sendEmptyMessage(MSG_UPDATE_TIMER);
                 break;
-            case MSG_PAUSE_TIMER:
-                timer.pause();
-                listener.onTimerUpdate(timer.getElapsedTimeMili() + "");
+            case MSG_STOP_TIMER:
+                timer.stop();
+                listener.onTimerUpdate(timer.getElapsedTime() + "");
                 removeMessages(MSG_UPDATE_TIMER);
                 break;
             case MSG_RESUME_TIMER:
                 timer.resume();
-                sendEmptyMessage(MSG_UPDATE_TIMER);
+                if (!timer.isStopped()) {
+                    sendEmptyMessage(MSG_UPDATE_TIMER);
+                }
                 break;
             case MSG_RESET_TIMER:
                 timer.reset();

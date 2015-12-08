@@ -29,16 +29,13 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
                 switch (id) {
                     case R.id.startStopButton:
                         if (presenter.isTimerRunning()) {
-                            if (presenter.isTimerPaused()) {
+                            if (presenter.isTimerStopped()) {
                                 showResumed(false);
-                                startStopButton.setText("Stop");
                             } else {
-                                showPaused(false);
-                                startStopButton.setText("Start");
+                                showStopped(false);
                             }
                         } else {
                             showStarted(false);
-                            startStopButton.setText("Stop");
                         }
                         break;
                     case R.id.resetButton:
@@ -47,7 +44,6 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
                 }
             }
         };
-
         startStopButton = (Button) findViewById(R.id.startStopButton);
         startStopButton.setOnClickListener(buttonListener);
         resetButton = (Button) findViewById(R.id.resetButton);
@@ -81,10 +77,14 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        presenter.saveTimerObjectToFile(this);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (!isRestoringViewState())
-            presenter.saveTimerObjectToFile(this);
     }
 
     @Override
@@ -96,10 +96,10 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
     @Override
     public void showStarted(boolean wasDestroyed) {
         Log.i("Destroyed", wasDestroyed + "");
+        startStopButton.setText("Stop");
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerRunning();
-
         if (isRestoringViewState() || wasDestroyed) {
             //animation here
             showResumed(wasDestroyed);
@@ -110,27 +110,28 @@ public class TimerActivity extends MvpViewStateActivity<TimerView, TimerPresente
 
     @Override
     public void showResumed(boolean wasDestroyed) {
+        startStopButton.setText("Stop");
         if (vs == null)
             vs = (TimerViewState) viewState;
         vs.setTimerRunning();
-
         presenter.resume();
     }
 
     @Override
-    public void showPaused(boolean wasDestroyed) {
+    public void showStopped(boolean wasDestroyed) {
+        startStopButton.setText("Start");
         if (vs == null)
             vs = (TimerViewState) viewState;
-        vs.setTimerPaused();
-
-        presenter.pause();
+        vs.setTimerStopped();
+        presenter.stop();
     }
 
     @Override
     public void resetTime() {
+        startStopButton.setText("Start");
         if (vs == null)
             vs = (TimerViewState) viewState;
-        vs.setTimerStopped();
+        vs.setTimerReseted();
 
         presenter.reset();
     }

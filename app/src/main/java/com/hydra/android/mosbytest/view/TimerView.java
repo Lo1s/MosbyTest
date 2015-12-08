@@ -9,7 +9,7 @@ public interface TimerView extends MvpView {
 
     void showStarted(boolean wasDestroyed);
     void showResumed(boolean wasDestroyed);
-    void showPaused(boolean wasDestroyed);
+    void showStopped(boolean wasDestroyed);
     void showTime(String time);
     void resetTime();
 }
