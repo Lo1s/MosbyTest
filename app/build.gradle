@@ -25,6 +25,7 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.hannesdorfmann.mosby:mvp:2.0.0'
     compile 'com.hannesdorfmann.mosby:viewstate:2.0.0'
+    compile 'com.code-troopers.betterpickers:library:2.2.1'
     compile files('libs/gson-2.4-javadoc.jar')
     compile files('libs/gson-2.4.jar')
 }

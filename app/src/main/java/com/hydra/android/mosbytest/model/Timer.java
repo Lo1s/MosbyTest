@@ -17,6 +17,7 @@ public class Timer {
     private long minute;
     private long second;
     private long startTime = 0;
+    private long endTime;
     private long elapsedTime = 0;
     private long currentTime = 0;
     private boolean running = false;
@@ -28,10 +29,14 @@ public class Timer {
             this.startTime = System.currentTimeMillis();
             this.running = true;
             this.stopped = false;
-        } else {
+        } else { // Count down timer is running
             if (!isStopped()) {
-                this.startTime = System.currentTimeMillis()
+                this.startTime = System.currentTimeMillis() + this.hour + this.minute + this.second;
+                this.endTime = System.currentTimeMillis();
+            } else {
+                this.startTime = System.currentTimeMillis() + elapsedTime;
             }
+            this.running = true;
         }
     }
 
@@ -42,6 +47,9 @@ public class Timer {
                 this.stopped = false;
             }
             this.running = true;
+        } else { // Count down timer is running
+            this.running = true;
+            this.stopped = false;
         }
     }
 
@@ -51,21 +59,26 @@ public class Timer {
                 this.elapsedTime = System.currentTimeMillis() - startTime;
             this.stopped = true;
             this.running = true;
+        } else {
+            this.elapsedTime = startTime - System.currentTimeMillis();
+            this.running = true;
+            this.stopped = true;
         }
     }
 
     public void reset() {
-        if (isStopWatch) {
-            this.running = false;
-            this.stopped = false;
-            this.isStopWatch = true;
-            this.startTime = 0;
-            this.elapsedTime = 0;
-        }
+        this.running = false;
+        this.stopped = false;
+        this.isStopWatch = true;
+        this.startTime = 0;
+        this.elapsedTime = 0;
+
     }
 
     public void setCountDownTime(long hour, long minute, long second) {
-
+        this.hour = hour;
+        this.minute = minute;
+        this.second = second;
     }
 
     public void setStartTime(long startTime) {
